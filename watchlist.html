@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PopcornPicks - Watchlist</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url('/static/movies.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Montserrat', sans-serif;
+            color: #FFF;
+        }
+        .overlay {
+            background: rgba(15, 15, 15, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 1000px;
+            margin: 5% auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+        }
+        .navbar {
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.9) 0%, rgba(0, 0, 0, 0.9) 100%);
+            padding: 15px 30px;
+            border-bottom: 2px solid #FFD700;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 28px;
+            color: #FFD700 !important;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+        .navbar-brand:hover {
+            color: #FFF !important;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+        .nav-item a {
+            color: #FFD700 !important;
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-right: 20px;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+        .nav-item a:hover {
+            color: #FFF !important;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+        .logout-btn {
+            background-color: #FFD700;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .logout-btn:hover {
+            background-color: #FFF;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+        .watchlist-item {
+            background-color: #333;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+        }
+        .watchlist-item img {
+            border-radius: 10px;
+            margin-right: 20px;
+            max-width: 150px;
+        }
+        .watchlist-info h5 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #FFD700;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+        .watchlist-info h5:hover {
+            color: #FFF;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+        .status-btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn-watched {
+            background-color: #28a745;
+            color: #FFF;
+        }
+        .btn-watched:hover {
+            background-color: #218838;
+        }
+        .btn-unwatched {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .btn-unwatched:hover {
+            background-color: #e0a800;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">PopcornPicks</a>
+        <ul class="navbar-nav">
+            <li class="nav-item"><a href="/recommendation">Recommendations</a></li>
+            <li class="nav-item"><a href="/watchlist">Watchlist</a></li>
+            <li class="nav-item">
+                <form action="/logout" method="post">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="overlay">
+        <h1 class="text-center mb-4">Your Watchlist</h1>
+
+        {% if watchlist %}
+            <div id="watchlist-movies">
+                {% for movie in watchlist %}
+                    <div class="watchlist-item">
+                        <img src="{{ movie.poster }}" alt="{{ movie.title }} Poster" loading="lazy">
+                        <div class="watchlist-info">
+                            <h5>{{ movie.title }}</h5>
+                            <p>Status: {{ movie.status }}</p>
+                            <button class="status-btn btn-watched" onclick="updateStatus('{{ movie.title }}', 'watched')">Mark as Watched</button>
+                            <button class="status-btn btn-unwatched" onclick="updateStatus('{{ movie.title }}', 'unwatched')">Mark as Unwatched</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center">Your watchlist is empty.</p>
+        {% endif %}
+    </div>
+
+    <script defer>
+        async function updateStatus(title, status) {
+            try {
+                const response = await fetch('/update_status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, status }),
+                });
+                const data = await response.json();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to update status');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

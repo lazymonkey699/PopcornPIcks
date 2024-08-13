@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>PopcornPicks</title>
+</head>
+<body>
+    <header>
+        <h1>🎬 PopcornPicks</h1>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="loadContent('/recommendation')">Recommendations</a></li>
+                <li><a href="#" onclick="loadContent('/watchlist')">Watchlist</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container" id="content">
+        {% block content %}{% endblock %}
+    </div>
+    <footer>
+        <p>Designed and Developed by Abhishek Bam</p>
+    </footer>
+
+    <script>
+        function loadContent(url) {
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('content').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error loading content:', error);
+            });
+        }
+    </script>
+</body>
+</html>

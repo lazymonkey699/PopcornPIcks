@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PopcornPicks - Recommendations</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url('/static/movies.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Montserrat', sans-serif;
+            color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+        }
+        .overlay {
+            background: rgba(15, 15, 15, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 1000px;
+            margin: 5% auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+        }
+        .navbar {
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.9) 0%, rgba(0, 0, 0, 0.9) 100%);
+            padding: 15px 30px;
+            border-bottom: 2px solid #FFD700;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 28px;
+            color: #FFD700 !important;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+        .navbar-brand:hover {
+            color: #ffffff !important;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin-left: 20px;
+        }
+
+        .nav-item a {
+            color: #FFD700 !important;
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+        .nav-item a:hover {
+            color: #ffffff !important;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+
+        .logout-btn {
+            background-color: #FFD700;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .logout-btn:hover {
+            background-color: #ffffff;
+            color: #000;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-control {
+            border-radius: 20px;
+        }
+        .btn-primary {
+            background-color: #FFD700;
+            color: #000;
+            border-radius: 20px;
+            font-weight: bold;
+            border: none;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #ffffff;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+        .movie-card {
+            background-color: #333;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            transition: box-shadow 0.3s ease;
+        }
+        .movie-card:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+        .movie-card img {
+            border-radius: 10px;
+            margin-right: 20px;
+            max-width: 150px;
+        }
+        .movie-info h5 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+        .movie-info p {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .watchlist-btn {
+            background-color: #FFD700;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .watchlist-btn:hover {
+            background-color: #ffffff;
+            color: #000;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">PopcornPicks</a>
+        <ul class="navbar-nav">
+            <li class="nav-item"><a href="/recommendation">Recommendations</a></li>
+            <li class="nav-item"><a href="/watchlist">Watchlist</a></li>
+            <li class="nav-item">
+                <form action="/logout" method="post">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="overlay">
+        <h1 class="text-center mb-4">Find Your Next Favorite Movie</h1>
+        <form action="/recommendation" method="post">
+            <div class="input-group mb-4">
+                <input type="text" class="form-control" name="movie_name" placeholder="Enter a movie name" required>
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Recommend</button>
+                </div>
+            </div>
+        </form>
+        
+        {% if movies_with_details %}
+            <div id="recommended-movies">
+                {% for movie in movies_with_details %}
+                    <div class="movie-card">
+                        <img src="{{ movie.poster }}" alt="{{ movie.title }} Poster">
+                        <div class="movie-info">
+                            <h5>{{ movie.title }}</h5>
+                            <p>Rating: {{ movie.rating }}</p>
+                            <p>{{ movie.description }}</p>
+                            <button class="watchlist-btn" onclick="addToWatchlist('{{ movie.title }}', '{{ movie.poster }}')">Add to Watchlist</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center">Search for a movie to see recommendations.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        function addToWatchlist(title, poster) {
+            fetch('/add_to_watchlist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title: title, poster: poster })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      alert("Added to Watchlist");
+                  } else {
+                      alert("Failed to add to Watchlist");
+                  }
+              });
+        }
+    </script>
+</body>
+</html>
